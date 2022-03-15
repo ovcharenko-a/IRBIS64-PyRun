@@ -1,0 +1,8 @@
+Release/
+Debug/
+ipch/
+python37.lib
+pyrun.sdf
+pyrun.v12.suo
+pyrun.vcxproj.user
+pyrun.opensdf
