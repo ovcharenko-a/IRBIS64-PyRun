@@ -18,48 +18,83 @@ BOOL APIENTRY DllMain (HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 
 __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 {
-	int len = strlen(buf1);
+	int len = strlen(buf1) + 1;
 	char * strCopy = NULL;
-	strCopy = (char *)malloc((len)* sizeof (char)); // для хранения '\ 0' выделяется дополнительное пространство символов
+	strCopy = (char *)malloc((len)* sizeof (char));
 	if (strCopy == NULL){
+		strcpy_s(buf2, size, "no copy");
 		return -1;
 	}
-	strcpy_s(strCopy, size, buf1); // Копируем строку str
-
-	char * func = strCopy;
+	strcpy_s(strCopy, size, buf1);
+	//Режь
+	char * module_name = strCopy;
+	char * func_name = NULL;
 	char * data = NULL;
 	for (int i = 0; strCopy[i] != '\0'; i++) {
-		if (strCopy[i] == '|') {
+		if (strCopy[i] == '|' && func_name == NULL){
+			strCopy[i] = '\0';
+			i++;
+			func_name = &strCopy[i];
+		}
+		else if (strCopy[i] == '|') {
 			strCopy[i] = '\0';
 			data = &strCopy[i + 1];
 			break;
 		}
 	}
+	//Проверь всё
 	if (data == NULL){
 		free(strCopy);
+		strcpy_s(buf2, size, "no function");
 		return -2;
 	}
 	if (data[0] == '\0'){
 		free(strCopy);
+		strcpy_s(buf2, size, "empty data");
 		return -3;
 	}
-	char * buf4 = NULL;
-	buf4 = python_func_get_str(func, data);
-	if (buf4 == NULL){
+	if (func_name == NULL){
+		free(strCopy);
+		strcpy_s(buf2, size, "no module");
+		return -4;
+	}
+	if (func_name[0] == '\0'){
+		free(strCopy);
+		strcpy_s(buf2, size, "empty func");
+		return -5;
+	}
+	if (func_name == NULL){
+		free(strCopy);
+		strcpy_s(buf2, size, "no module");
+		return -6;
+	}
+	if (func_name[0] == '\0'){
+		free(strCopy);
+		strcpy_s(buf2, size, "empty func");
+		return -7;
+	}
+	if (module_name[0] == '\0'){
+		free(strCopy);
+		strcpy_s(buf2, size, "empty module");
+		return -8;
+	}
+	char * result = NULL;
+	result = python_func_get_str(module_name, func_name, data);
+	if (result == NULL){
 		free(strCopy);
 		return -4;
 	}
-	if (strcmp(buf4, "None") == 0)
+	if (strcmp(result, "None") == 0)
 	{	
 		free(strCopy);
 		return -5;
 	}
-	strcpy_s(buf2, size, buf4);
+	strcpy_s(buf2, size, result);
 	free(strCopy);
 	return 0;
 }
 
-PyObject* python_init(char* func_name) {
+PyObject* python_init(char* module_name, char* func_name){
 	// Инициализировать интерпретатор Python
 	Py_Initialize();
 	PyObject *pDict, *pName, *pModule;
@@ -103,10 +138,10 @@ PyObject* python_init(char* func_name) {
 	return NULL;
 }
 
-char* python_func_get_str(char* func_name, char *val) {
+char* python_func_get_str(char* module_name, char* func_name, char *val) {
 	char *ret = NULL;
 	PyObject *pObjct, *pDict, *pVal;
-	pDict = python_init(func_name);
+	pDict = python_init(module_name, func_name);
 	// Загрузка объекта get_value из func.py
 	pObjct = PyDict_GetItemString(pDict, (const char *) "main");
 	if (!pObjct) {

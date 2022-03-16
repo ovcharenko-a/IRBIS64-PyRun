@@ -20,5 +20,5 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-PyObject* python_init(char* func_name);
-char* python_func_get_str(char* func_name, char *val);
+PyObject* python_init(char* module_name, char* func_name);
+char* python_func_get_str(char* module_name, char* func_name, char *val);
