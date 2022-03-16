@@ -94,21 +94,14 @@ __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 	return 0;
 }
 
-PyObject* python_init(char* module_name, char* func_name){
+PyObject* python_init(char* module_name){
 	// Инициализировать интерпретатор Python
 	Py_Initialize();
 	PyObject *pDict, *pName, *pModule;
 
 	do {
-		// Загрузка модуля sys
-		//sys = PyImport_ImportModule("sys");
-		//sys_path = PyObject_GetAttrString(sys, "path");
-		// Путь до наших исходников Python
-		//folder_path = PyUnicode_FromString((const char*) "E:\\Server\\PHP7");
-		//PyList_Append(sys_path, folder_path);
 
-		// Загрузка func.py
-		pName = PyUnicode_FromString(func_name);
+		pName = PyUnicode_FromString(module_name);
 		if (!pName) {
 			break;
 		}
@@ -126,14 +119,10 @@ PyObject* python_init(char* module_name, char* func_name){
 		}
 		Py_XDECREF(pName);
 		Py_XDECREF(pModule);
-		//Py_XDECREF(sys);
-		//Py_XDECREF(sys_path);
+
 		return pDict;
 	} while (0);
 	Py_XDECREF(pName);
-	//Py_XDECREF(sys);
-	//Py_XDECREF(sys_path);
-	// Печать ошибки
 	PyErr_Print();
 	return NULL;
 }
@@ -141,9 +130,9 @@ PyObject* python_init(char* module_name, char* func_name){
 char* python_func_get_str(char* module_name, char* func_name, char *val) {
 	char *ret = NULL;
 	PyObject *pObjct, *pDict, *pVal;
-	pDict = python_init(module_name, func_name);
+	pDict = python_init(module_name);
 	// Загрузка объекта get_value из func.py
-	pObjct = PyDict_GetItemString(pDict, (const char *) "main");
+	pObjct = PyDict_GetItemString(pDict,  func_name);
 	if (!pObjct) {
 		return ret;
 	}
