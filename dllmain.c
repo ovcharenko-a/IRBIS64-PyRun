@@ -119,11 +119,10 @@ PyObject* python_init(char* module_name){
 		}
 		Py_XDECREF(pName);
 		Py_XDECREF(pModule);
-
 		return pDict;
 	} while (0);
 	Py_XDECREF(pName);
-	PyErr_Print();
+		PyErr_Print();
 	return NULL;
 }
 
@@ -131,8 +130,8 @@ char* python_func_get_str(char* module_name, char* func_name, char *val) {
 	char *ret = NULL;
 	PyObject *pObjct, *pDict, *pVal;
 	pDict = python_init(module_name);
-	// Загрузка объекта get_value из func.py
-	pObjct = PyDict_GetItemString(pDict,  func_name);
+	// Загрузка объекта функции
+	pObjct = PyDict_GetItemString(pDict, (const char *) func_name);
 	if (!pObjct) {
 		return ret;
 	}
@@ -161,7 +160,6 @@ char* python_func_get_str(char* module_name, char* func_name, char *val) {
 	// Вернуть ресурсы системе
 	Py_XDECREF(pObjct);
 	Py_XDECREF(pDict);
-
 
 	// Выгрузка интерпретатора Python
 	Py_Finalize();
