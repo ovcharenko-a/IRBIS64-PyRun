@@ -18,11 +18,20 @@ BOOL APIENTRY DllMain (HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 
 __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 {
+	//Check! Debug mode!
+	int debug_mode = 0;
+	if (buf1[0] == '!'){
+		buf1++;
+		debug_mode = 1;
+	}
+	//Копируй
 	int len = strlen(buf1) + 1;
 	char * strCopy = NULL;
 	strCopy = (char *)malloc((len)* sizeof (char));
 	if (strCopy == NULL){
-		strcpy_s(buf2, size, "no copy");
+		if (debug_mode){
+			strcpy_s(buf2, size, "Can't memory malloc");
+		}
 		return -1;
 	}
 	strcpy_s(strCopy, size, buf1);
@@ -45,49 +54,69 @@ __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 	//Проверь всё
 	if (data == NULL){
 		free(strCopy);
-		strcpy_s(buf2, size, "no function");
+		if (debug_mode){
+			strcpy_s(buf2, size, "No function name");
+		}
 		return -2;
 	}
 	if (data[0] == '\0'){
 		free(strCopy);
-		strcpy_s(buf2, size, "empty data");
+		if (debug_mode){
+			strcpy_s(buf2, size, "Empty data for python");
+		}
 		return -3;
 	}
 	if (func_name == NULL){
 		free(strCopy);
-		strcpy_s(buf2, size, "no module");
+		if (debug_mode){
+			strcpy_s(buf2, size, "No module name");
+		}
 		return -4;
 	}
 	if (func_name[0] == '\0'){
 		free(strCopy);
-		strcpy_s(buf2, size, "empty func");
+		if (debug_mode){
+			strcpy_s(buf2, size, "Empty function name");
+		}
 		return -5;
 	}
 	if (func_name == NULL){
 		free(strCopy);
-		strcpy_s(buf2, size, "no module");
+		if (debug_mode){
+			strcpy_s(buf2, size, "No module name");
+		}
 		return -6;
 	}
 	if (func_name[0] == '\0'){
 		free(strCopy);
-		strcpy_s(buf2, size, "empty func");
+		if (debug_mode){
+			strcpy_s(buf2, size, "Empty function name");
+		}
 		return -7;
 	}
 	if (module_name[0] == '\0'){
 		free(strCopy);
-		strcpy_s(buf2, size, "empty module");
+		if (debug_mode){
+			strcpy_s(buf2, size, "Empty module name");
+		}
 		return -8;
 	}
 	char * result = NULL;
 	result = python_func_get_str(module_name, func_name, data);
 	if (result == NULL){
 		free(strCopy);
-		return -4;
+		if (debug_mode){
+			strcpy_s(buf2, size, "Python result NULL");
+		}
+		return -9;
 	}
 	if (strcmp(result, "None") == 0)
 	{	
 		free(strCopy);
-		return -5;
+		if (debug_mode){
+			strcpy_s(buf2, size, "Python return None");
+		}
+		return -10;
 	}
 	strcpy_s(buf2, size, result);
 	free(strCopy);
