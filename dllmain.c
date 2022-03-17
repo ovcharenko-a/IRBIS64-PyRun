@@ -52,54 +52,35 @@ __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 		}
 	}
 	//Проверь всё
-	if (data == NULL){
+
+	if (func_name == NULL){
 		free(strCopy);
 		if (debug_mode){
 			strcpy_s(buf2, size, "No function name");
 		}
 		return -2;
 	}
-	if (data[0] == '\0'){
+	if (func_name[0] == '\0'){
 		free(strCopy);
 		if (debug_mode){
-			strcpy_s(buf2, size, "Empty data for python");
+			strcpy_s(buf2, size, "Empty function name");
 		}
 		return -3;
 	}
-	if (func_name == NULL){
+
+	if (module_name == NULL){
 		free(strCopy);
 		if (debug_mode){
 			strcpy_s(buf2, size, "No module name");
 		}
 		return -4;
 	}
-	if (func_name[0] == '\0'){
-		free(strCopy);
-		if (debug_mode){
-			strcpy_s(buf2, size, "Empty function name");
-		}
-		return -5;
-	}
-	if (func_name == NULL){
-		free(strCopy);
-		if (debug_mode){
-			strcpy_s(buf2, size, "No module name");
-		}
-		return -6;
-	}
-	if (func_name[0] == '\0'){
-		free(strCopy);
-		if (debug_mode){
-			strcpy_s(buf2, size, "Empty function name");
-		}
-		return -7;
-	}
 	if (module_name[0] == '\0'){
 		free(strCopy);
 		if (debug_mode){
 			strcpy_s(buf2, size, "Empty module name");
 		}
-		return -8;
+		return -5;
 	}
 	char * result = NULL;
 	result = python_func_get_str(module_name, func_name, data);
@@ -108,7 +89,7 @@ __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 		if (debug_mode){
 			strcpy_s(buf2, size, "Python result NULL");
 		}
-		return -9;
+		return -6;
 	}
 	if (strcmp(result, "None") == 0)
 	{	
@@ -116,7 +97,7 @@ __declspec(dllexport) int __cdecl StrPyStr (char *buf1, char *buf2, int size)
 		if (debug_mode){
 			strcpy_s(buf2, size, "Python return None");
 		}
-		return -10;
+		return -7;
 	}
 	strcpy_s(buf2, size, result);
 	free(strCopy);
